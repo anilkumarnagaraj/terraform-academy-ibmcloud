@@ -30,13 +30,19 @@ variable "schematics_workspace_location" {
 variable "schematics_workspace_name" {
   description = "The name of your workspace. The name can be up to 128 characters long and can include alphanumeric characters, spaces, dashes, and underscores. When you create a workspace for your own Terraform template, consider including the microservice component that you set up with your Terraform template and the IBM Cloud environment where you want to deploy your resources in your name."
   type        = string
-  default     = "vit-workspace"
+  default     = "academy-trainingworkspace"
 }
 
 variable "schematics_workspace_template_repo" {
   description = "Template repo to provision the cloud resource."
   type        = string
-  default     = "https://github.ibm.com/Mujeebur-Rahman/terraform-academy-ibmcloud/tree/main/course-content"
+  default     = "https://github.com/Cloud-Schematics/terraform-academy-ibmcloud/tree/dev/course-content"
+}
+
+variable "invite_user_list" {
+  type        = list(string)
+  description = "Name of the Access Group used for Training in comma (,) seperated values"
+  default     = ["user@testdomain.com"]
 }
 
 ##########################################################
@@ -46,7 +52,7 @@ variable "schematics_workspace_template_repo" {
 variable "namespace" {
   description = "The name IAM based cloud function namespace."
   type        = string
-  default     = "vit-namespace"
+  default     = "academy-trainingnamespace"
 }
 
 variable "action_name" {

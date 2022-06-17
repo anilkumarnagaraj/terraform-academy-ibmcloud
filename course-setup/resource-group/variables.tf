@@ -3,6 +3,9 @@
 # Copyright 2022 IBM
 #####################################################
 
-provider "ibm" {
-  ibmcloud_api_key = var.ibmcloud_api_key
+
+variable "rg_name" {
+  type        = string
+  description = "Name of the Resource Group used for Training"
+  default     = "tf-academy-training-RG"
 }

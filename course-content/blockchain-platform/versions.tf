@@ -2,7 +2,6 @@
 # IBM Cloud - Terraform Academy Training
 # Copyright 2022 IBM
 #####################################################
-
 terraform {
   required_version = ">=0.13"
   required_providers {
@@ -12,3 +11,4 @@ terraform {
     }
   }
 }
+

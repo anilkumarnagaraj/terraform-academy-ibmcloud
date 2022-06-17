@@ -3,12 +3,6 @@
 # Copyright 2022 IBM
 #####################################################
 
-terraform {
-  required_version = ">=0.13"
-  required_providers {
-    ibm = {
-      source  = "IBM-Cloud/ibm"
-      version = "1.42.0"
-    }
-  }
+resource "ibm_resource_group" "rg" {
+  name = var.rg_name
 }

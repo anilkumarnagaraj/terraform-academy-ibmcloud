@@ -3,17 +3,24 @@
 # Copyright 2022 IBM
 #####################################################
 
+
 # Resource Group 
-variable "rg_name" {
-  description = "Resource Groupr Name"
+variable "course_rg_name" {
+  description = "Name of the Resource Group used for Training"
   type        = string
-  default     = "VIT-Training-RG"
+  default     = "tf-academy-training-RG"
 }
 
-# Student API key
-variable "ibmcloud_api_key" {
-  description = "Student API key to provision services required for training."
+variable "accgrp_name" {
   type        = string
+  description = "Name of the Access Group used for Training"
+  default     = "tf-academy-training-AG"
+}
+
+variable "invite_user_list" {
+  type        = list(string)
+  description = "Name of the Access Group used for Training in comma (,) seperated values"
+  default     = ["user@testdomain.com"]
 }
 
 # Common
@@ -56,9 +63,21 @@ variable "bch_name" {
   default     = "VIT-blockchain-service"
 }
 
+variable "bch_plan" {
+  description = "Blockchain Platform service Plan"
+  type        = string
+  default     = "standard"
+}
+
 # IOT Platform - https://cloud.ibm.com/catalog/services/internet-of-things-platform
 variable "iot_name" {
   description = "Blockchain Platform service instance name"
   type        = string
   default     = "VIT-iot-service"
+}
+
+variable "iot_plan" {
+  description = "IOT Platform service Plan"
+  type        = string
+  default     = "iotf-service-free"
 }
