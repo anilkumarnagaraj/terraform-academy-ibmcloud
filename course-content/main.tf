@@ -4,7 +4,7 @@
 #####################################################
 
 module "course-setup" {
-  source = "github.com/Cloud-Schematics/terraform-academy-ibmcloud//course-setup?ref=dev"
+  source = "github.com/anilkumarnagaraj/terraform-academy-ibmcloud//course-setup?ref=fix_path_issue"
 
   rg_name          = var.course_rg_name
   accgrp_name      = var.accgrp_name
