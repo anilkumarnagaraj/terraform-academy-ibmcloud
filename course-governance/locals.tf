@@ -4,7 +4,8 @@
 #####################################################
 
 locals {
-  data = jsondecode(data.local_file.read_job.content)
+  invite_list = format("[\"%s\"]", join("\", \"", var.invite_user_list))
+  data = jsondecode(data.local_file.read_job[0].content)
 }
 
 locals {

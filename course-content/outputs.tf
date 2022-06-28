@@ -2,7 +2,7 @@
 # IBM Cloud - Terraform Academy Training
 # Copyright 2022 IBM
 #####################################################
-
+/*
 output "blockchain-dashboard-url" {
   value       = module.blockchain.blockchain-dashboard-url
   description = "blockchain Service Dashboard URL"
@@ -26,3 +26,4 @@ output "watson-studio-dashboard-url" {
   description = "Watson Studio Dashboard URL"
   sensitive   = false
 }
+*/

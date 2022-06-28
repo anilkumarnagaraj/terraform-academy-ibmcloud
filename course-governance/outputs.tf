@@ -4,7 +4,7 @@
 #####################################################
 
 output "workspace_id" {
-  value       = ibm_schematics_workspace.schematics_workspace_instance.id
+  value       = ibm_schematics_workspace.schematics_workspace_instance.*.id
   description = "schematics_workspace resource instance"
 }
 

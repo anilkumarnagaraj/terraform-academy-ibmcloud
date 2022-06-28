@@ -18,12 +18,14 @@ resource "ibm_function_action" "action" {
 
   exec {
     kind = "python:3.9"
-    code = file("${path.module}/scripts/main.py")
+    code = file("${path.module}/scripts/schematics_decommission.py")
   }
 }
 
 resource "ibm_function_trigger" "trigger" {
-  name      = var.trigger_name
+  count     = length(var.invite_user_list)
+
+  name      = "${var.trigger_name}-${count.index}"
   namespace = ibm_function_namespace.namespace.name
   feed {
     name       = "/whisk.system/alarms/alarm"
@@ -45,7 +47,7 @@ resource "ibm_function_trigger" "trigger" {
 	  	},
       {
 	   		"key":"workspace_id",
-	   		"value":"${ibm_schematics_workspace.schematics_workspace_instance.id}"
+	   		"value":"${ibm_schematics_workspace.schematics_workspace_instance[count.index].id}"
 	  	}
 	   ]
 	EOF
@@ -54,8 +56,10 @@ resource "ibm_function_trigger" "trigger" {
 }
 
 resource "ibm_function_rule" "rule" {
-  name         = var.rule_name
+  count        = length(var.invite_user_list)
+
+  name         = "${var.rule_name}-${count.index}"
   namespace    = ibm_function_namespace.namespace.name
-  trigger_name = ibm_function_trigger.trigger.name
+  trigger_name = ibm_function_trigger.trigger[count.index].name
   action_name  = ibm_function_action.action.name
 }

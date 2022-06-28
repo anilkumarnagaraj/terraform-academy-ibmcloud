@@ -20,7 +20,6 @@ variable "accgrp_name" {
 variable "invite_user_list" {
   type        = list(string)
   description = "Name of the Access Group used for Training in comma (,) seperated values"
-  default     = ["user@testdomain.com"]
 }
 
 # Common
@@ -28,6 +27,30 @@ variable "location" {
   description = "Provisioning Region/Location for the instance"
   type        = string
   default     = "us-south"
+}
+
+variable "create_bc" {
+  description = "If set to true, it will create block chain"
+  type        = bool
+  default     = true
+}
+
+variable "create_iot" {
+  description = "If set to true, it will create iot"
+  type        = bool
+  default     = true
+}
+
+variable "create_ml" {
+  description = "If set to true, it will create machine learning"
+  type        = bool
+  default     = true
+}
+
+variable "create_ws" {
+  description = "If set to true, it will create watson"
+  type        = bool
+  default     = true
 }
 
 # Watson Studio - https://cloud.ibm.com/catalog/services/watson-studio

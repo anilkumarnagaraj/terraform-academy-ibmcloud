@@ -4,7 +4,9 @@
 #####################################################
 
 output "machine-learning-dashboard-url" {
-  value       = ibm_resource_instance.pm-20.dashboard_url
+  value       = var.create_ml ? concat(ibm_resource_instance.pm-20.*.dashboard_url, [""])[0] : ""
   description = "Machine Learning Service Dashboard URL"
   sensitive   = false
 }
+
+

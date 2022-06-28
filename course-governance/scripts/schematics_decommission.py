@@ -1,6 +1,7 @@
 import requests
 import json
 import copy
+import smtplib
 
 TOKEN_URL = "https://iam.cloud.ibm.com/identity/token"
 SCHEMATCIS_API = "https://us.schematics.cloud.ibm.com"
@@ -32,6 +33,24 @@ def delete_workspace_resource(access_token, refresh_token, workspace_id):
     if response.status_code not in ERR_STATUS_CODE:
         return response.json()
 
+def send_mail():
+    sender = 'anilkumar@in.ibm.com'
+    receivers = ['anilkumar@in.ibm.com']
+
+    message = """From: No Reply <no_reply@mydomain.com>
+    To: Person <person@otherdomain.com>
+    Subject: Test Email
+
+    This is a test e-mail message.
+    """
+
+    try:
+        smtp_obj = smtplib.SMTP('localhost')
+        smtp_obj.sendmail(sender, receivers, message)         
+        print("Successfully sent email")
+    except smtplib.SMTPException:
+        print("Error: unable to send email")
+
 def main(args):
     
     apikey = args['apikey']
@@ -47,5 +66,6 @@ def main(args):
         return {"error" : "Failed to fetch refresh and access tokens"}
     
     # Delete schematics workspace resource
+    #send_mail()
     response = delete_workspace_resource(access_token, refresh_token, workspace_id)
     return response

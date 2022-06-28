@@ -36,13 +36,12 @@ variable "schematics_workspace_name" {
 variable "schematics_workspace_template_repo" {
   description = "Template repo to provision the cloud resource."
   type        = string
-  default     = "https://github.com/Cloud-Schematics/terraform-academy-ibmcloud/tree/dev/course-content"
+  default     = "https://github.com/anilkumarnagaraj/terraform-academy-ibmcloud/tree/fix_governance/course-content"
 }
 
 variable "invite_user_list" {
   type        = list(string)
   description = "Name of the Access Group used for Training in comma (,) seperated values"
-  default     = ["user@testdomain.com"]
 }
 
 ##########################################################
@@ -61,6 +60,12 @@ variable "action_name" {
   default     = "schematics-cron"
 }
 
+variable "apply_action_name" {
+  description = "Action name."
+  type        = string
+  default     = "schematics-apply"
+}
+
 variable "trigger_name" {
   description = "Trigger name."
   type        = string
@@ -77,4 +82,28 @@ variable "decomission_timer" {
   description = "Time length to de-provision the resource after the creation.."
   type        = string
   default     = "4m"
+}
+
+variable "create_bc" {
+  description = "If set to true, it will create block chain"
+  type        = bool
+  default     = true
+}
+
+variable "create_iot" {
+  description = "If set to true, it will create iot"
+  type        = bool
+  default     = true
+}
+
+variable "create_ml" {
+  description = "If set to true, it will create machine learning"
+  type        = bool
+  default     = true
+}
+
+variable "create_ws" {
+  description = "If set to true, it will create watson"
+  type        = bool
+  default     = true
 }

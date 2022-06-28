@@ -19,5 +19,4 @@ variable "accgrp_name" {
 variable "invite_user_list" {
   type        = list(string)
   description = "Name of the Access Group used for Training in comma (,) seperated values"
-  default     = ["test@testdomain.com"]
 }
