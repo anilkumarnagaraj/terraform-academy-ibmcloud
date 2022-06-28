@@ -5,7 +5,6 @@
 
 # IOT Platform - https://cloud.ibm.com/catalog/services/internet-of-things-platform
 resource "ibm_resource_instance" "iotf-service" {
-  count             = var.create_iot ? 1 : 0
   name              = var.iot_name
   service           = "iotf-service"
   plan              = var.iot_plan

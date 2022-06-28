@@ -3,11 +3,6 @@
 # Copyright 2022 IBM
 #####################################################
 
-variable "create_ml" {
-  description = "If set to true, it will create machine learning"
-  type        = bool
-}
-
 # Resource Group 
 variable "course_rg_id" {
   description = "Resource Groupe ID"

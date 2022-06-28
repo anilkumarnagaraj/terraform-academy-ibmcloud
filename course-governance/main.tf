@@ -3,33 +3,42 @@
 # Copyright 2022 IBM
 #####################################################
 
+resource "ibm_resource_group" "rg" {
+  name = "${var.course_prefix}-RG"
+}
+
 // Create schematics_workspace resource
 resource "ibm_schematics_workspace" "schematics_workspace_instance" {
-  count            = length(var.invite_user_list)
+  for_each = {for i, v in var.invite_user_list:  i => v}
 
   location         = var.schematics_workspace_location
-  name             = "${var.schematics_workspace_name}-${count.index}"
-  resource_group   = "${var.schematics_workspace_resource_group}"
-  template_type    = "terraform_v0.13.5"
+  name             = "${var.course_prefix}-workspace-${each.key}"
+  resource_group   = "${var.course_prefix}-RG"
+  template_type    = "terraform_v1.0"
   template_git_url = var.schematics_workspace_template_repo
 
+  template_inputs {
+    name  = "course_resource_group_id"
+    type  = "string"
+    value = "${ibm_resource_group.rg.id}"
+  }
 
   template_inputs {
-    name  = "course_rg_name"
+    name  = "course_prefix"
     type  = "string"
-    value = "tf-academy-training-RG-${count.index}"
+    value = "${var.course_prefix}-${each.value.name}"
   }
 
   template_inputs {
     name  = "accgrp_name"
     type  = "string"
-    value = "tf-academy-training-AG-${count.index}"
+    value = "tf-academy-training-AG-${each.key}"
   }
 
   template_inputs {
     name  = "invite_user_list"
     type  = "list(string)"
-    value = local.invite_list
+    value = "[\"${each.value.email}\"]"
   }
 
   template_inputs {
@@ -56,6 +65,24 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance" {
     value = var.create_ws
   }
 
+  template_inputs {
+    name  = "create_vsi"
+    type  = "bool"
+    value = var.create_vsi
+  }
+
+  template_inputs {
+    name  = "image"
+    type  = "string"
+    value = var.image
+  }
+
+  template_inputs {
+    name  = "profile"
+    type  = "string"
+    value = var.profile
+  }
+
   lifecycle {
     ignore_changes = [
       template_git_url,
@@ -68,19 +95,19 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance" {
 
 // Provision resource
 resource "null_resource" "schematics_apply" {
-  count            = length(var.invite_user_list)
+  for_each = {for i, v in var.invite_user_list:  i => v}
 
   triggers = {
     API_KEY        = var.ibmcloud_api_key
-    WORKSPACE_ID   = ibm_schematics_workspace.schematics_workspace_instance[count.index].id
+    WORKSPACE_ID   = ibm_schematics_workspace.schematics_workspace_instance[each.key].id
   }
 
   provisioner "local-exec" {
     when    = create
     environment = {
       API_KEY        = var.ibmcloud_api_key
-      WORKSPACE_ID   = ibm_schematics_workspace.schematics_workspace_instance[count.index].id
-      JOB_ID         = count.index
+      WORKSPACE_ID   = ibm_schematics_workspace.schematics_workspace_instance[each.key].id
+      JOB_ID         = each.key
     }
 
     command = "${path.module}/scripts/schematics_apply.py"
@@ -89,16 +116,15 @@ resource "null_resource" "schematics_apply" {
 
   provisioner "local-exec" {
     when    = destroy
-    command = "rm -rf /tmp/.schematics/job_info.json"
+    command = "rm -rf /tmp/.schematics/job_info_${each.key}.json"
   }
-
 
 }
 
 // Read job information
 data "local_file" "read_job" {
-  count = 1
-  filename = "/tmp/.schematics/job_info.json"
+  for_each = {for i, v in var.invite_user_list:  i => v}
+  filename = "/tmp/.schematics/job_info_${each.key}.json"
   depends_on = [null_resource.schematics_apply]
 }
 

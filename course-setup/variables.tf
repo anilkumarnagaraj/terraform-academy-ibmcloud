@@ -3,11 +3,9 @@
 # Copyright 2022 IBM
 #####################################################
 
-
-variable "rg_name" {
+variable "course_resource_group_id" {
   type        = string
-  description = "Name of the Resource Group used for Training"
-  default     = "tf-academy-training-RG"
+  description = "Resource Group ID used for Training"
 }
 
 variable "accgrp_name" {

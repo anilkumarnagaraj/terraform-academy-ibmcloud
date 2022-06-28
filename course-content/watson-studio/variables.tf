@@ -3,11 +3,6 @@
 # Copyright 2022 IBM
 #####################################################
 
-variable "create_ws" {
-  description = "If set to true, it will create watson"
-  type        = bool
-}
-
 # Resource Group 
 variable "course_rg_id" {
   description = "Resource Groupe ID"
@@ -30,5 +25,5 @@ variable "ws_name" {
 variable "ws_plan" {
   description = "Watson Studio service instance Plan"
   type        = string
-  default     = "free-v1" # Other supported plan 'enterprise-v1'.
+  default     = "professional-v1" # Other supported plan 'free-v1'.
 }

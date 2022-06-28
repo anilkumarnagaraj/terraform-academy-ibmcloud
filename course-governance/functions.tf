@@ -3,13 +3,9 @@
 # Copyright 2022 IBM
 #####################################################
 
-data "ibm_resource_group" "resource-group" {
-  name = var.schematics_workspace_resource_group
-}
-
 resource "ibm_function_namespace" "namespace" {
   name              = var.namespace
-  resource_group_id = data.ibm_resource_group.resource-group.id
+  resource_group_id = ibm_resource_group.rg.id
 }
 
 resource "ibm_function_action" "action" {
@@ -23,9 +19,9 @@ resource "ibm_function_action" "action" {
 }
 
 resource "ibm_function_trigger" "trigger" {
-  count     = length(var.invite_user_list)
+  for_each = { for k, instance in flatten(local.activity_list): k => instance }
 
-  name      = "${var.trigger_name}-${count.index}"
+  name      = format("%s-%s-%s", var.trigger_name, var.decomission_timer, each.value["prop"]["index"])
   namespace = ibm_function_namespace.namespace.name
   feed {
     name       = "/whisk.system/alarms/alarm"
@@ -33,7 +29,7 @@ resource "ibm_function_trigger" "trigger" {
 		[
 			{
 				"key":"cron",
-				"value":"${local.cron_expr}"
+				"value":"${each.value["prop"]["cron_expr"]}"
 			}
 		]
 	EOF
@@ -46,8 +42,12 @@ resource "ibm_function_trigger" "trigger" {
 	   		"value":"${var.ibmcloud_api_key}"
 	  	},
       {
+	   		"key":"decomission_timer",
+	   		"value":"${var.decomission_timer}"
+	  	},
+      {
 	   		"key":"workspace_id",
-	   		"value":"${ibm_schematics_workspace.schematics_workspace_instance[count.index].id}"
+	   		"value":"${each.value["prop"]["workspace_id"]}"
 	  	}
 	   ]
 	EOF
