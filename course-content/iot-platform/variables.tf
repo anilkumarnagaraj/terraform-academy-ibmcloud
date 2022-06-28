@@ -3,11 +3,6 @@
 # Copyright 2022 IBM
 #####################################################
 
-variable "create_iot" {
-  description = "If set to true, it will create iot"
-  type        = bool
-}
-
 # Resource Group 
 variable "course_rg_id" {
   description = "Resource Groupe ID"

@@ -4,14 +4,20 @@
 #####################################################
 
 locals {
-  invite_list = format("[\"%s\"]", join("\", \"", var.invite_user_list))
-  data = jsondecode(data.local_file.read_job[0].content)
-}
+  user_list = chunklist(var.invite_user_list, 8)
 
-locals {
-  job_destroy_timestamp = timeadd(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", local.data.end_at), var.decomission_timer)
-}
-
-locals {
-  cron_expr = format("%s %s %s * *", substr(local.job_destroy_timestamp, 14, 2), substr(local.job_destroy_timestamp, 11, 2), substr(local.job_destroy_timestamp, 8, 2))
+  activity_list = [
+  for idx, prop in var.invite_user_list:
+    { 
+      prop = { 
+        "apikey"                = prop["apikey"]
+        "index"                 = idx
+        "workspace_id"          = jsondecode(data.local_file.read_job[idx].content).command_object_id 
+        "end_at"                = jsondecode(data.local_file.read_job[idx].content).end_at 
+        "job_destroy_timestamp" = timeadd(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", jsondecode(data.local_file.read_job[idx].content).end_at ), var.decomission_timer)
+        "cron_expr"             = format("%s %s %s * *", substr(timeadd(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", jsondecode(data.local_file.read_job[idx].content).end_at), var.decomission_timer), 14, 2), substr(timeadd(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", jsondecode(data.local_file.read_job[idx].content).end_at), var.decomission_timer), 11, 2), substr(timeadd(formatdate("YYYY-MM-DD'T'hh:mm:ssZ", jsondecode(data.local_file.read_job[idx].content).end_at), var.decomission_timer), 8, 2))
+      }
+    }
+  ]
+  
 }

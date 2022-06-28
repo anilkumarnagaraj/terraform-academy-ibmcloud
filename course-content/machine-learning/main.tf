@@ -5,7 +5,6 @@
 
 # Machine Learning - https://cloud.ibm.com/catalog/services/machine-learning
 resource "ibm_resource_instance" "pm-20" {
-  count             = var.create_ml ? 1 : 0
   name              = var.ml_name
   service           = "pm-20"
   plan              = var.ml_plan

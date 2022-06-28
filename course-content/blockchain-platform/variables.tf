@@ -4,11 +4,6 @@
 # Copyright 2022 IBM
 #####################################################
 
-variable "create_bc" {
-  description = "If set to true, it will create vm"
-  type        = bool
-}
-
 # Resource Group 
 variable "course_rg_id" {
   description = "Resource Groupe ID"

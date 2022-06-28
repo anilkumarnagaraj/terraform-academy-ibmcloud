@@ -12,9 +12,15 @@ variable "ibmcloud_api_key" {
   type        = string
 }
 
-variable "schematics_workspace_resource_group" {
-  description = "The ID of the resource group where you want to provision the workspace."
+variable "training_rg_name" {
+  description = "Name of resource group where you want to provision the workspace."
   type        = string
+}
+
+variable "course_prefix" {
+  description = "Resource Group ID used for Training"
+  type        = string
+  default     = "tf-acacdemy-training"
 }
 
 ##########################################################
@@ -40,8 +46,11 @@ variable "schematics_workspace_template_repo" {
 }
 
 variable "invite_user_list" {
-  type        = list(string)
-  description = "Name of the Access Group used for Training in comma (,) seperated values"
+  type = list(object({
+    name   = string
+    email  = string
+    apikey = string
+  }))
 }
 
 ##########################################################
@@ -87,23 +96,45 @@ variable "decomission_timer" {
 variable "create_bc" {
   description = "If set to true, it will create block chain"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "create_iot" {
   description = "If set to true, it will create iot"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "create_ml" {
   description = "If set to true, it will create machine learning"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "create_ws" {
   description = "If set to true, it will create watson"
   type        = bool
+  default     = false
+}
+
+#####################################################
+# VPC Parameters
+#####################################################
+
+variable "create_vsi" {
+  description = "If set to true, it will create VSI"
+  type        = bool
   default     = true
+}
+
+variable "image" {
+  description = "Image ID for the instance"
+  type        = string
+  default     = "ibm-redhat-7-9-minimal-amd64-3"
+}
+
+variable "profile" {
+  description = "Profile type for the Instance"
+  type        = string
+  default     = "bx2-2x8"
 }

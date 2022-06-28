@@ -5,7 +5,6 @@
 
 # Watson Studio - https://cloud.ibm.com/catalog/services/watson-studio
 resource "ibm_resource_instance" "data-science-experience" {
-  count             = var.create_ws ? 1 : 0
   name              = var.ws_name
   service           = "data-science-experience"
   plan              = var.ws_plan
