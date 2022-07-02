@@ -3,11 +3,9 @@
 # Copyright 2022 IBM
 #####################################################
 
-
-variable "rg_name" {
+variable "course_resource_group_id" {
   type        = string
-  description = "Name of the Resource Group used for Training"
-  default     = "tf-academy-training-RG"
+  description = "Resource Group ID used for Training"
 }
 
 variable "accgrp_name" {
@@ -19,5 +17,4 @@ variable "accgrp_name" {
 variable "invite_user_list" {
   type        = list(string)
   description = "Name of the Access Group used for Training in comma (,) seperated values"
-  default     = ["test@testdomain.com"]
 }

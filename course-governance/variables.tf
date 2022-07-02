@@ -12,9 +12,10 @@ variable "ibmcloud_api_key" {
   type        = string
 }
 
-variable "schematics_workspace_resource_group" {
-  description = "The ID of the resource group where you want to provision the workspace."
+variable "course_prefix" {
+  description = "Resource Group ID used for Training"
   type        = string
+  default     = "tf-acacdemy-training"
 }
 
 ##########################################################
@@ -36,13 +37,15 @@ variable "schematics_workspace_name" {
 variable "schematics_workspace_template_repo" {
   description = "Template repo to provision the cloud resource."
   type        = string
-  default     = "https://github.com/Cloud-Schematics/terraform-academy-ibmcloud/tree/dev/course-content"
+  default     = "https://github.com/anilkumarnagaraj/terraform-academy-ibmcloud/tree/fix_governance/course-content"
 }
 
 variable "invite_user_list" {
-  type        = list(string)
-  description = "Name of the Access Group used for Training in comma (,) seperated values"
-  default     = ["user@testdomain.com"]
+  type = list(object({
+    name   = string
+    email  = string
+    apikey = string
+  }))
 }
 
 ##########################################################
@@ -61,6 +64,12 @@ variable "action_name" {
   default     = "schematics-cron"
 }
 
+variable "apply_action_name" {
+  description = "Action name."
+  type        = string
+  default     = "schematics-apply"
+}
+
 variable "trigger_name" {
   description = "Trigger name."
   type        = string
@@ -77,4 +86,50 @@ variable "decomission_timer" {
   description = "Time length to de-provision the resource after the creation.."
   type        = string
   default     = "4m"
+}
+
+variable "create_bc" {
+  description = "If set to true, it will create block chain"
+  type        = bool
+  default     = false
+}
+
+variable "create_iot" {
+  description = "If set to true, it will create iot"
+  type        = bool
+  default     = false
+}
+
+variable "create_ml" {
+  description = "If set to true, it will create machine learning"
+  type        = bool
+  default     = false
+}
+
+variable "create_ws" {
+  description = "If set to true, it will create watson"
+  type        = bool
+  default     = false
+}
+
+#####################################################
+# VPC Parameters
+#####################################################
+
+variable "create_vsi" {
+  description = "If set to true, it will create VSI"
+  type        = bool
+  default     = true
+}
+
+variable "image" {
+  description = "Image ID for the instance"
+  type        = string
+  default     = "ibm-redhat-7-9-minimal-amd64-3"
+}
+
+variable "profile" {
+  description = "Profile type for the Instance"
+  type        = string
+  default     = "bx2-2x8"
 }

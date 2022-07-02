@@ -8,3 +8,4 @@ output "iot-service-dashboard-url" {
   description = "IOT Service Dashboard URL"
   sensitive   = false
 }
+

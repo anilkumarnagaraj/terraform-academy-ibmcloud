@@ -3,13 +3,9 @@
 # Copyright 2022 IBM
 #####################################################
 
-data "ibm_resource_group" "resource-group" {
-  name = var.schematics_workspace_resource_group
-}
-
 resource "ibm_function_namespace" "namespace" {
   name              = var.namespace
-  resource_group_id = data.ibm_resource_group.resource-group.id
+  resource_group_id = ibm_resource_group.rg.id
 }
 
 resource "ibm_function_action" "action" {
@@ -18,12 +14,14 @@ resource "ibm_function_action" "action" {
 
   exec {
     kind = "python:3.9"
-    code = file("${path.module}/scripts/main.py")
+    code = file("${path.module}/scripts/schematics_decommission.py")
   }
 }
 
 resource "ibm_function_trigger" "trigger" {
-  name      = var.trigger_name
+  for_each = { for k, instance in flatten(local.activity_list): k => instance }
+
+  name      = format("%s-%s-%s", var.trigger_name, var.decomission_timer, each.value["prop"]["index"])
   namespace = ibm_function_namespace.namespace.name
   feed {
     name       = "/whisk.system/alarms/alarm"
@@ -31,7 +29,7 @@ resource "ibm_function_trigger" "trigger" {
 		[
 			{
 				"key":"cron",
-				"value":"${local.cron_expr}"
+				"value":"${each.value["prop"]["cron_expr"]}"
 			}
 		]
 	EOF
@@ -44,8 +42,12 @@ resource "ibm_function_trigger" "trigger" {
 	   		"value":"${var.ibmcloud_api_key}"
 	  	},
       {
+	   		"key":"decomission_timer",
+	   		"value":"${var.decomission_timer}"
+	  	},
+      {
 	   		"key":"workspace_id",
-	   		"value":"${ibm_schematics_workspace.schematics_workspace_instance.id}"
+	   		"value":"${each.value["prop"]["workspace_id"]}"
 	  	}
 	   ]
 	EOF
@@ -54,8 +56,10 @@ resource "ibm_function_trigger" "trigger" {
 }
 
 resource "ibm_function_rule" "rule" {
-  name         = var.rule_name
+  count        = length(var.invite_user_list)
+
+  name         = "${var.rule_name}-${count.index}"
   namespace    = ibm_function_namespace.namespace.name
-  trigger_name = ibm_function_trigger.trigger.name
+  trigger_name = ibm_function_trigger.trigger[count.index].name
   action_name  = ibm_function_action.action.name
 }
