@@ -118,7 +118,7 @@ variable "iot_plan" {
 variable "create_vsi" {
   description = "True to create new VSI for VPC. False if VPC is already existing and subnets or address prefixies are to be added"
   type        = bool
-  default     = "true"
+  default     = "false"
 }
 
 variable "vpc_name" {

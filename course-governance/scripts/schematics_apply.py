@@ -2,10 +2,14 @@ import requests
 import json
 import os
 import time
+import argparse
+import multiprocessing
+import base64
+
 
 TOKEN_URL = "https://iam.cloud.ibm.com/identity/token"
 SCHEMATCIS_API = "https://us.schematics.cloud.ibm.com"
-ERR_STATUS_CODE = [400, 401, 404, 403, 500, 502]
+ERR_STATUS_CODE = [400, 401, 404, 403, 409, 500, 502]
 NONE_TYPE = type(None)
 
 def get_tokens(apikey, add_user=True):
@@ -23,61 +27,57 @@ def get_tokens(apikey, add_user=True):
         access_token = 'Bearer ' + data['access_token']
     return access_token, refresh_token
 
-def get_worksapce_info(access_token, workspace_id, retries=0):
-    if retries > 10: return
-    try:
-        schematics_headers = {'Authorization' : access_token}
-        response = requests.get(SCHEMATCIS_API+'/v1/workspaces/{}'.format(workspace_id), headers=schematics_headers)
-        if type(response.json()) == NONE_TYPE:
-                time.sleep(5)    
-                retries+=1
-                get_worksapce_info(access_token, workspace_id, retries)
-        elif response.status_code not in ERR_STATUS_CODE:
-            return response.json()
-    except:
-        time.sleep(5)    
-        retries+=1
-        get_worksapce_info(access_token, workspace_id, retries)
-        
-
-def apply_plan(ws_id, access_token, refresh_token, retries=0):
-    if retries > 10: return
-    try:
-        schematics_headers = {
-            'Authorization' : access_token,
-            'refresh_token' : refresh_token
-        }
-        response = requests.put(SCHEMATCIS_API+'/v1/workspaces/{}/apply'.format(ws_id), headers=schematics_headers)
-        if type(response.json()) == NONE_TYPE:
-            time.sleep(5)    
-            retries+=1
-            apply_plan(ws_id, access_token, refresh_token, retries)
-        elif response.status_code not in ERR_STATUS_CODE:
-            data = response.json()
-            return data
-    except:
-        time.sleep(5)    
-        retries+=1
-        apply_plan(ws_id, access_token, refresh_token, retries)
-
+def get_worksapce_info(access_token, workspace_id):
+    while True:
+        try:
+            schematics_headers = {
+                'Authorization' : access_token,
+                'Accept': 'application/json'
+            }
+            response = requests.get(SCHEMATCIS_API+'/v1/workspaces/{}'.format(workspace_id), headers=schematics_headers)
+            if response.status_code not in ERR_STATUS_CODE:
+                return response.json()
+            else:
+                time.sleep(30) 
+        except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError):
+            # To avoid resource controller rate limiting error adding 30 secs sleep timer
+            time.sleep(30)    
     
-def get_job_info(access_token, job_id, retries=0):
-    if retries > 10: return
-    try:
-        schematics_headers = {'Authorization' : access_token}
-        response = requests.get(SCHEMATCIS_API+'/v2/jobs/{}'.format(job_id), headers=schematics_headers)
-        if type(response.json()) == NONE_TYPE:
-                time.sleep(5)    
-                retries+=1
-                get_job_info(access_token, job_id, retries)
-        elif response.status_code not in ERR_STATUS_CODE:
-            return response.json()
-    except:
-        time.sleep(5)    
-        retries+=1
-        get_job_info(access_token, job_id, retries)
-    
-
+def apply_plan(ws_id, access_token, refresh_token):
+    while True:
+        try:
+            schematics_headers = {
+                'Authorization' : access_token,
+                'refresh_token' : refresh_token,
+                'Accept': 'application/json'
+            }
+            response = requests.put(SCHEMATCIS_API+'/v1/workspaces/{}/apply'.format(ws_id), headers=schematics_headers)
+            if response.status_code not in ERR_STATUS_CODE:
+                data = response.json()
+                return data
+            else:
+                time.sleep(30)
+        except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError):
+            # To avoid resource controller rate limiting error adding 30 secs sleep timer
+            time.sleep(30)
+          
+def get_job_info(access_token, job_id):
+    while True:
+        try:
+            schematics_headers = {
+                'Authorization' : access_token,
+                'Accept': 'application/json'
+            }
+            response = requests.get(SCHEMATCIS_API+'/v2/jobs/{}'.format(job_id), headers=schematics_headers)
+            if response.status_code not in ERR_STATUS_CODE:
+                data = response.json()
+                return data
+            else:
+                time.sleep(30)
+        except (requests.exceptions.ConnectionError, json.decoder.JSONDecodeError):
+             # To avoid resource controller rate limiting error adding 30 secs sleep timer
+            time.sleep(30) 
+   
 def convert_dict_to_json(data):
     # Convert dict to str
     json_str = json.dumps(data, indent = 4) 
@@ -86,58 +86,112 @@ def convert_dict_to_json(data):
     
     return json_object
 
-def main():
-    apikey = os.getenv('API_KEY')
-    workspace_id = os.getenv('WORKSPACE_ID')
-    job_index = os.getenv('JOB_ID')
-   
-    if  apikey == "" or workspace_id == "":
-        print('No apikey or worspaces_id is provided!')
-        return {"error" : "No apikey or worspaces_id is provided"}
+def base64_decode_message(base64_message):
+    base64_bytes = base64_message.encode('ascii')
+    message_bytes = base64.b64decode(base64_bytes)
+    message = message_bytes.decode('ascii')
+    
+    return message  
 
-    if not os.path.exists('/tmp/.schematics'):
-        os.makedirs('/tmp/.schematics', exist_ok=True)
-
-    access_token, refresh_token = get_tokens(apikey)
-    if refresh_token == "" or access_token == "":
-        print('Failed to fetch refresh and access tokens') 
-        return {"error" : "Failed to fetch refresh and access tokens"}
-
-    time.sleep(30)
-
-     # Get schematics workspace details
-    while True:  
+def task(access_token, refresh_token, workspace_id, workspace_name, job_index):
+    # Get schematics workspace details
+    while True:
         ws_info = get_worksapce_info(access_token, workspace_id)
         if type(ws_info) != NONE_TYPE and 'status' in ws_info:
+            # Check workspace is already in active state  
+            if ws_info['status'] == "ACTIVE" and ws_info["last_action_name"] == "APPLY" and ws_info["last_activity_id"] != "":
+                job_data = get_job_info(access_token, ws_info["last_activity_id"])
+                if type(job_data) != NONE_TYPE:
+                        with open(''.join(["/tmp/.schematics/job_info_", str(job_index), ".json"]), "w") as outfile:
+                            json.dump(job_data, outfile)
+                        return {"info" : "Schematics apply plan completed successfully."}    
             if ws_info['status'] == "INACTIVE" or ws_info['status'] == "ACTIVE" or ws_info['status'] == "FAILED":
                 break
-        time.sleep(2)
+        time.sleep(5)
 
     # Apply plan on schematics workspace
     data = apply_plan(workspace_id, access_token, refresh_token)
-    print("Response:", data, type(data))
     json_object = convert_dict_to_json(data)
     if type(json_object) != NONE_TYPE:
         job_id = json_object["activityid"]
     else:
-         exit("Schematics apply plan failed to get response for job id.")   
+        print("Schematics apply plan failed to get response for job in workspace "+ workspace_name +".")
+        exit(1)
     
+    # Wait for apply plan to start processing
+    time.sleep(30)
+
+    # Get apply plan status
     status = "provisioning"
-    while status != "job_in_progress":
-         # Get apply plan status
+    while status != "job_finished" or status != "job_failed":
+        # Get apply plan status
         job_data = get_job_info(access_token, job_id)
         if type(job_data) != NONE_TYPE:
             json_object = convert_dict_to_json(job_data)
             if type(json_object) != NONE_TYPE and 'status' in json_object:
                 status = json_object["status"]["workspace_job_status"]["status_code"]
-                if status == "job_failed":
-                    exit("Schematics Apply Plan Failed.")
-                elif status == "job_in_progress":  
-                    with open(''.join(["/tmp/.schematics/job_info_", job_index, ".json"]), "w") as outfile:
+                if status == "job_finished":  
+                    with open(''.join(["/tmp/.schematics/job_info_", str(job_index), ".json"]), "w") as outfile:
                         json.dump(job_data, outfile)
+                    return {"info" : "Schematics apply plan completed successfully."}
+                elif status == "job_failed":
+                    print("Schematics Apply Plan Failed on workspace " + workspace_name +". Check workspace apply logs for more details on failure.")
+                    with open(''.join(["/tmp/.schematics/job_info_", str(job_index), ".json"]), "w") as outfile:
+                        json.dump(job_data, outfile)
+                    return {"error" : "Schematics Apply Plan Failed on workspace " + workspace_name + "."}     
+                        
+def main():
+    start_time = time.perf_counter()
+    processes = []
+
+    # Parse arguments from command line
+    parser = argparse.ArgumentParser()
+    # Set up required arguments this script
+    parser.add_argument('ibmcloud_api_key', type=str, help='ibmcloud_api_key')
+    parser.add_argument('workspace_ids', type=str, help='workspace_ids')
+    parser.add_argument('user_list', type=str, help='user_list')
     
-    return {"info" : "Schematics apply plan initiated successfully."}
+    # Parse the given arguments
+    args = parser.parse_args()
+    apikey = base64_decode_message(args.ibmcloud_api_key)
+    workspace_obj = json.loads(base64_decode_message(args.workspace_ids))
 
+    if not os.path.exists('/tmp/.schematics'):
+        os.makedirs('/tmp/.schematics', exist_ok=True)
 
-if __name__ == "__main__":
+    i = 0
+    for workspace_id in workspace_obj:
+        workspace_name = workspace_obj[workspace_id]
+        if  apikey == "" or workspace_id == "":
+            print('No apikey or worspaces_id is provided!')
+            return {"error" : "No apikey or worspaces_id is provided"}
+
+        access_token, refresh_token = get_tokens(apikey)
+        if refresh_token == "" or access_token == "":
+            print('Failed to fetch refresh and access tokens') 
+            return {"error" : "Failed to fetch refresh and access tokens"}
+
+        time.sleep(2)
+        p = multiprocessing.Process(target = task, args=(access_token, refresh_token, workspace_id, workspace_name, i))
+        p.start()
+        processes.append(p)
+        i+=1
+
+    # Joins all the processes 
+    for p in processes:
+        print()
+        p.join()
+
+    # Check json files created for all workspaces
+    while i < len(workspace_obj):
+        file_name = "/tmp/.schematics/job_info_" + str(i) + ".json"
+        if os.path.exists(file_name) == False:
+            print("Schematics Apply Plan not able to create job status file " + file_name +" for student workspace. Verify the students workspace logs for any failure or re-run the governance workspace again.") 
+            exit(1)
+
+    finish_time = time.perf_counter()
+    print(f"Program finished in {finish_time-start_time} seconds.")  
+
+if __name__ == '__main__':
     main()
+

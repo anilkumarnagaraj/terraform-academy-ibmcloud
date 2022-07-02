@@ -8,4 +8,9 @@ module "iam_policy" {
   resource_group_id = var.course_resource_group_id
   accgrp_name       = var.accgrp_name
   invite_user_list  = var.invite_user_list
+  create_bc         = var.create_bc
+  create_iot        = var.create_iot
+  create_ml         = var.create_ml
+  create_ws         = var.create_ws
+  create_vsi        = var.create_vsi
 }

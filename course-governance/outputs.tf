@@ -3,6 +3,6 @@
 # Copyright 2022 IBM
 #####################################################
 
-output "workspace_information" {
-  value = local.activity_list
+output "workspace_decommission_list" {
+  value = local.workspace_decommission_list
 }

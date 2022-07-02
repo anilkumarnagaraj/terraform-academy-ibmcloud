@@ -34,13 +34,28 @@ variable "invite_user_list" {
       email  = "user2@domain.com"
       apikey = "apikey-2"
     },
+    {
+      name   = "user-3"
+      email  = "user3@domain.com"
+      apikey = "apikey-3"
+    },
+    {
+      name   = "user-4"
+      email  = "user4@domain.com"
+      apikey = "apikey-4"
+    },
+    {
+      name   = "user-5"
+      email  = "user5@domain.com"
+      apikey = "apikey-5"
+    },
   ]
 }
 
 variable "decomission_timer" {
   description = "Time length to de-provision the resource after the creation."
   type        = string
-  default     = "15m"
+  default     = "10m"
 }
 
 # Blockchain
@@ -51,12 +66,24 @@ variable "create_bc" {
   default     = false
 }
 
+variable "bch_plan" {
+  description = "Blockchain Platform service Plan"
+  type        = string
+  default     = "standard"
+}
+
 # IOT
 
 variable "create_iot" {
   description = "If set to true, it will create iot"
   type        = bool
   default     = false
+}
+
+variable "iot_plan" {
+  description = "IOT Platform service Plan"
+  type        = string
+  default     = "iotf-service-free"
 }
 
 # Machine Learning
@@ -67,7 +94,13 @@ variable "create_ml" {
   default     = false
 }
 
-# Blockchain
+variable "ml_plan" {
+  description = "Machine learning service instance Plan"
+  type        = string
+  default     = "lite" # Other supported plans 'v2-standard/v2-professional'.
+}
+
+# Watson
 
 variable "create_ws" {
   description = "If set to true, it will create watson"
@@ -75,12 +108,18 @@ variable "create_ws" {
   default     = true
 }
 
+variable "ws_plan" {
+  description = "Watson Studio service instance Plan"
+  type        = string
+  default     = "professional-v1" # Other supported plan 'free-v1'.
+}
+
 # Virtual Server for VPC
 
 variable "create_vsi" {
   description = "If set to true, it will create VSI"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "image" {

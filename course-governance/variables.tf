@@ -37,7 +37,7 @@ variable "schematics_workspace_name" {
 variable "schematics_workspace_template_repo" {
   description = "Template repo to provision the cloud resource."
   type        = string
-  default     = "https://github.com/anilkumarnagaraj/terraform-academy-ibmcloud/tree/fix_governance/course-content"
+  default     = "https://github.com/Cloud-Schematics/terraform-academy-ibmcloud/tree/dev/course-content"
 }
 
 variable "invite_user_list" {
@@ -46,6 +46,14 @@ variable "invite_user_list" {
     email  = string
     apikey = string
   }))
+
+  default = [
+    {
+      name   = "user-1"
+      email  = "user1@domain.com"
+      apikey = "apikey-1"
+    },
+  ]
 }
 
 ##########################################################
@@ -94,10 +102,22 @@ variable "create_bc" {
   default     = false
 }
 
+variable "bch_plan" {
+  description = "Blockchain Platform service Plan"
+  type        = string
+  default     = "standard"
+}
+
 variable "create_iot" {
   description = "If set to true, it will create iot"
   type        = bool
   default     = false
+}
+
+variable "iot_plan" {
+  description = "IOT Platform service Plan"
+  type        = string
+  default     = "iotf-service-free"
 }
 
 variable "create_ml" {
@@ -106,10 +126,22 @@ variable "create_ml" {
   default     = false
 }
 
+variable "ml_plan" {
+  description = "Watson Studio service instance Plan"
+  type        = string
+  default     = "lite" # Other supported plans 'v2-standard/v2-professional'.
+}
+
 variable "create_ws" {
   description = "If set to true, it will create watson"
   type        = bool
   default     = false
+}
+
+variable "ws_plan" {
+  description = "Watson Studio service instance Plan"
+  type        = string
+  default     = "professional-v1" # Other supported plan 'free-v1'.
 }
 
 #####################################################
@@ -119,7 +151,7 @@ variable "create_ws" {
 variable "create_vsi" {
   description = "If set to true, it will create VSI"
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "image" {

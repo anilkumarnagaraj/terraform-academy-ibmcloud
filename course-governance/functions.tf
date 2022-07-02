@@ -19,7 +19,7 @@ resource "ibm_function_action" "action" {
 }
 
 resource "ibm_function_trigger" "trigger" {
-  for_each = { for k, instance in flatten(local.activity_list): k => instance }
+  for_each = { for k, instance in flatten(local.workspace_decommission_list) : k => instance }
 
   name      = format("%s-%s-%s", var.trigger_name, var.decomission_timer, each.value["prop"]["index"])
   namespace = ibm_function_namespace.namespace.name
@@ -39,7 +39,7 @@ resource "ibm_function_trigger" "trigger" {
 	   [
 	  	{
 	   		"key":"apikey",
-	   		"value":"${var.ibmcloud_api_key}"
+	   		"value":"${base64encode(var.ibmcloud_api_key)}"
 	  	},
       {
 	   		"key":"decomission_timer",
@@ -56,7 +56,7 @@ resource "ibm_function_trigger" "trigger" {
 }
 
 resource "ibm_function_rule" "rule" {
-  count        = length(var.invite_user_list)
+  count = length(var.invite_user_list)
 
   name         = "${var.rule_name}-${count.index}"
   namespace    = ibm_function_namespace.namespace.name

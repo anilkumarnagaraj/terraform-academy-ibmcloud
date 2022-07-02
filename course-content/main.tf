@@ -6,11 +6,16 @@
 # IAM 
 
 module "course-setup" {
-  source = "github.com/anilkumarnagaraj/terraform-academy-ibmcloud//course-setup?ref=fix_governance"
+  source = "github.com/Cloud-Schematics/terraform-academy-ibmcloud//course-setup?ref=dev"
 
-  course_resource_group_id          = var.course_resource_group_id
-  accgrp_name                       = "${var.course_prefix}-AG"
-  invite_user_list                  = var.invite_user_list
+  course_resource_group_id = var.course_resource_group_id
+  accgrp_name              = "${var.course_prefix}-AG"
+  invite_user_list         = var.invite_user_list
+  create_bc                = var.create_bc
+  create_iot               = var.create_iot
+  create_ml                = var.create_ml
+  create_ws                = var.create_ws
+  create_vsi               = var.create_vsi
 }
 
 # VPC

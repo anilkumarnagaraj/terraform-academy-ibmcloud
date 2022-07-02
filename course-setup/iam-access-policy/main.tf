@@ -14,6 +14,7 @@ resource "ibm_iam_user_invite" "invite_user" {
 }
 
 resource "ibm_iam_access_group_policy" "ws-policy" {
+  count           = var.create_ws ? 1 : 0
   access_group_id = ibm_iam_access_group.accgrp.id
   roles           = ["Editor"] # Service level access not supported.
 
@@ -24,6 +25,7 @@ resource "ibm_iam_access_group_policy" "ws-policy" {
 }
 
 resource "ibm_iam_access_group_policy" "ml-policy" {
+  count           = var.create_ml ? 1 : 0
   access_group_id = ibm_iam_access_group.accgrp.id
   roles           = ["Editor", "Writer"]
 
@@ -34,6 +36,7 @@ resource "ibm_iam_access_group_policy" "ml-policy" {
 }
 
 resource "ibm_iam_access_group_policy" "bch-policy" {
+  count           = var.create_bc ? 1 : 0
   access_group_id = ibm_iam_access_group.accgrp.id
   roles           = ["Editor"]
 
@@ -45,6 +48,7 @@ resource "ibm_iam_access_group_policy" "bch-policy" {
 
 
 resource "ibm_iam_access_group_policy" "iotf-policy" {
+  count           = var.create_iot ? 1 : 0
   access_group_id = ibm_iam_access_group.accgrp.id
   roles           = ["Editor"]
 
