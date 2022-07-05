@@ -94,6 +94,7 @@ def base64_decode_message(base64_message):
     return message  
 
 def task(access_token, refresh_token, workspace_id, workspace_name, job_index):
+    job_file = "/tmp/.schematics/job_info_" + str(job_index) + ".json"
     # Get schematics workspace details
     while True:
         ws_info = get_worksapce_info(access_token, workspace_id)
@@ -102,8 +103,8 @@ def task(access_token, refresh_token, workspace_id, workspace_name, job_index):
             if ws_info['status'] == "ACTIVE" and ws_info["last_action_name"] == "APPLY" and ws_info["last_activity_id"] != "":
                 job_data = get_job_info(access_token, ws_info["last_activity_id"])
                 if type(job_data) != NONE_TYPE:
-                        with open(''.join(["/tmp/.schematics/job_info_", str(job_index), ".json"]), "w") as outfile:
-                            json.dump(job_data, outfile)
+                        with open(job_file, "w") as out_file:
+                            json.dump(job_data, out_file)
                         return {"info" : "Schematics apply plan completed successfully."}    
             if ws_info['status'] == "INACTIVE" or ws_info['status'] == "ACTIVE" or ws_info['status'] == "FAILED":
                 break
@@ -131,12 +132,12 @@ def task(access_token, refresh_token, workspace_id, workspace_name, job_index):
             if type(json_object) != NONE_TYPE and 'status' in json_object:
                 status = json_object["status"]["workspace_job_status"]["status_code"]
                 if status == "job_finished":  
-                    with open(''.join(["/tmp/.schematics/job_info_", str(job_index), ".json"]), "w") as outfile:
+                    with open(job_file, "w") as outfile:
                         json.dump(job_data, outfile)
                     return {"info" : "Schematics apply plan completed successfully."}
                 elif status == "job_failed":
                     print("Schematics Apply Plan Failed on workspace " + workspace_name +". Check workspace apply logs for more details on failure.")
-                    with open(''.join(["/tmp/.schematics/job_info_", str(job_index), ".json"]), "w") as outfile:
+                    with open(job_file, "w") as outfile:
                         json.dump(job_data, outfile)
                     return {"error" : "Schematics Apply Plan Failed on workspace " + workspace_name + "."}     
                         
@@ -183,11 +184,13 @@ def main():
         p.join()
 
     # Check json files created for all workspaces
-    while i < len(workspace_obj):
-        file_name = "/tmp/.schematics/job_info_" + str(i) + ".json"
+    idx = 0
+    for workspace_id in workspace_obj:
+        file_name = "/tmp/.schematics/job_info_" + str(idx) + ".json"
         if os.path.exists(file_name) == False:
-            print("Schematics Apply Plan not able to create job status file " + file_name +" for student workspace. Verify the students workspace logs for any failure or re-run the governance workspace again.") 
+            print("Schematics Apply Plan not able to create job status file in workspace '" + workspace_obj[workspace_id] +"'. Verify the students workspace logs for any failure or re-run the governance workspace again.") 
             exit(1)
+        idx+=1    
 
     finish_time = time.perf_counter()
     print(f"Program finished in {finish_time-start_time} seconds.")  
