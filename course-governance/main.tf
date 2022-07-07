@@ -18,6 +18,12 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance_1" {
   template_git_url = var.schematics_workspace_template_repo
 
   template_inputs {
+    name  = "ibmcloud_api_key"
+    type  = "string"
+    value = "${each.value.apikey}"
+  }
+
+  template_inputs {
     name  = "course_resource_group_id"
     type  = "string"
     value = ibm_resource_group.rg.id
@@ -131,6 +137,12 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance_2" {
   resource_group   = "default"
   template_type    = "terraform_v1.0"
   template_git_url = var.schematics_workspace_template_repo
+
+  template_inputs {
+    name  = "ibmcloud_api_key"
+    type  = "string"
+    value = "${each.value.apikey}"
+  }
 
   template_inputs {
     name  = "course_resource_group_id"
@@ -249,6 +261,12 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance_3" {
   template_git_url = var.schematics_workspace_template_repo
 
   template_inputs {
+    name  = "ibmcloud_api_key"
+    type  = "string"
+    value = "${each.value.apikey}"
+  }
+
+  template_inputs {
     name  = "course_resource_group_id"
     type  = "string"
     value = ibm_resource_group.rg.id
@@ -365,6 +383,12 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance_4" {
   template_git_url = var.schematics_workspace_template_repo
 
   template_inputs {
+    name  = "ibmcloud_api_key"
+    type  = "string"
+    value = "${each.value.apikey}"
+  }
+
+  template_inputs {
     name  = "course_resource_group_id"
     type  = "string"
     value = ibm_resource_group.rg.id
@@ -479,6 +503,12 @@ resource "ibm_schematics_workspace" "schematics_workspace_instance_5" {
   resource_group   = "default"
   template_type    = "terraform_v1.0"
   template_git_url = var.schematics_workspace_template_repo
+
+  template_inputs {
+    name  = "ibmcloud_api_key"
+    type  = "string"
+    value = "${each.value.apikey}"
+  }
 
   template_inputs {
     name  = "course_resource_group_id"

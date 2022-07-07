@@ -154,8 +154,8 @@ def main():
     
     # Parse the given arguments
     args = parser.parse_args()
-    apikey = base64_decode_message(args.ibmcloud_api_key)
     workspace_obj = json.loads(base64_decode_message(args.workspace_ids))
+    user_list = json.loads(base64_decode_message(args.user_list))
 
     if not os.path.exists('/tmp/.schematics'):
         os.makedirs('/tmp/.schematics', exist_ok=True)
@@ -163,6 +163,7 @@ def main():
     i = 0
     for workspace_id in workspace_obj:
         workspace_name = workspace_obj[workspace_id]
+        apikey = user_list[i]["apikey"]
         if  apikey == "" or workspace_id == "":
             print('No apikey or worspaces_id is provided!')
             return {"error" : "No apikey or worspaces_id is provided"}

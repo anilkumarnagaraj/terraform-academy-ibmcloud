@@ -37,7 +37,7 @@ variable "schematics_workspace_name" {
 variable "schematics_workspace_template_repo" {
   description = "Template repo to provision the cloud resource."
   type        = string
-  default     = "https://github.com/Cloud-Schematics/terraform-academy-ibmcloud/tree/dev/course-content"
+  default     = "https://github.com/anilkumarnagaraj/terraform-academy-ibmcloud/tree/fix_key/course-content"
 }
 
 variable "invite_user_list" {

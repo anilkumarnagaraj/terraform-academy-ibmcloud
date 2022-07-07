@@ -2,6 +2,10 @@
 # IBM Cloud - Terraform Academy Training
 # Copyright 2022 IBM
 #####################################################
+variable "ibmcloud_api_key" {
+  description = "IBM Cloud API key"
+  type        = string
+}
 
 variable "course_resource_group_id" {
   type        = string

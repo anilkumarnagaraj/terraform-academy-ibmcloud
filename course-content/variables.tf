@@ -3,6 +3,11 @@
 # Copyright 2022 IBM
 #####################################################
 
+variable "ibmcloud_api_key" {
+  description = "IBM Cloud API key"
+  type        = string
+}
+
 # Resource Group 
 variable "course_resource_group_id" {
   description = "Resource Group ID used for Training"

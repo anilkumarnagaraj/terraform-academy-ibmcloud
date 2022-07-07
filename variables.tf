@@ -29,51 +29,6 @@ variable "invite_user_list" {
       email  = "user1@domain.com"
       apikey = "apikey-1"
     },
-    {
-      name   = "user-2"
-      email  = "user2@domain.com"
-      apikey = "apikey-2"
-    },
-    {
-      name   = "user-3"
-      email  = "user3@domain.com"
-      apikey = "apikey-3"
-    },
-    {
-      name   = "user-4"
-      email  = "user4@domain.com"
-      apikey = "apikey-4"
-    },
-    {
-      name   = "user-5"
-      email  = "user5@domain.com"
-      apikey = "apikey-5"
-    },
-    {
-      name   = "user-6"
-      email  = "user6@domain.com"
-      apikey = "apikey-6"
-    },
-    {
-      name   = "user-7"
-      email  = "user7@domain.com"
-      apikey = "apikey-7"
-    },
-    {
-      name   = "user-8"
-      email  = "user8@domain.com"
-      apikey = "apikey-8"
-    },
-    {
-      name   = "user-9"
-      email  = "user9@domain.com"
-      apikey = "apikey-9"
-    },
-    {
-      name   = "user-10"
-      email  = "user10@domain.com"
-      apikey = "apikey-10"
-    },
   ]
 
   validation {

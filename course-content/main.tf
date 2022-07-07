@@ -6,8 +6,9 @@
 # IAM 
 
 module "course-setup" {
-  source = "github.com/Cloud-Schematics/terraform-academy-ibmcloud//course-setup?ref=dev"
+  source = "github.com/anilkumarnagaraj/terraform-academy-ibmcloud//course-setup?ref=fix_key"
 
+  ibmcloud_api_key         = var.ibmcloud_api_key
   course_resource_group_id = var.course_resource_group_id
   accgrp_name              = "${var.course_prefix}-AG"
   invite_user_list         = var.invite_user_list
